@@ -7,6 +7,7 @@ https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf
 https://www.exandroid.dev/2021/06/23/ad-cs-relay-attack-practical-guide/  
 https://github.com/leechristensen/SpoolSample  
 https://github.com/GhostPack/Rubeus  
+https://github.com/gentilkiwi/mimikatz/releases   
  
 How to  
 
