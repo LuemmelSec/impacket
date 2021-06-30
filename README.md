@@ -1,12 +1,13 @@
 # CVE-2021-1675
 
+Stolen from: https://github.com/cube0x0/CVE-2021-1675
+
 Impacket implementation of the [PrintNightmare ](https://github.com/afwu/PrintNightmare) PoC originally created by Zhiniang Peng (@edwardzpeng) & Xuefeng Li (@lxf02942370)
 
 Tested on a fully patched 2019 Domain Controller
 
 Execute malicious DLL's remote or locally
 
-![](Images/poc2.png)
 
 ### Installation
 
@@ -14,9 +15,9 @@ Before running the exploit you need to install my version of Impacket and after 
 
 ```
 pip3 uninstall impacket
-git clone https://github.com/cube0x0/impacket
+git clone --branch PrintNightmare https://github.com/LuemmelSec/impacket
 cd impacket
-python3 ./setup.py install
+python3 -m pip install .
 ```
 
 ### CVE-2021-1675.py
