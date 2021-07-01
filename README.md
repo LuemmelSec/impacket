@@ -40,7 +40,7 @@ cp evil64.dll /tmp/
 
 Build the DLL 32 bit:  
 ```
-i686-w64-mingw32-gcc -shared -evil32.dll evil.c -lnetapi32
+i686-w64-mingw32-gcc -shared -oevil32.dll evil.c -lnetapi32
 cp evil32.dll /tmp/
 ```
 
