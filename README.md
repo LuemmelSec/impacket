@@ -114,6 +114,8 @@ Or Uninstall Print-Services
 Uninstall-WindowsFeature Print-Services
 ```
 
+If one day there will be patches from MS to address all the flaws -> install them ASAP.  
+
 ### Further reading / tools  
 [Kevin Beaumont](https://twitter.com/GossiTheDog) gathered the most relevant facts and collected them here:  
 https://doublepulsar.com/zero-day-for-every-supported-windows-os-version-in-the-wild-printnightmare-b3fdb82f840c
