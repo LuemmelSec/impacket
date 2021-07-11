@@ -1,6 +1,6 @@
 # CVE-2021-1675
 
-Stolen from: https://github.com/cube0x0/CVE-2021-1675
+Borrowed from [cube0x0]()https://twitter.com/cube0x0 impacket fork: https://github.com/cube0x0/CVE-2021-1675  
 
 ### Install
 
@@ -28,7 +28,7 @@ cp Tchar.h /usr/i686-w64-mingw32/include
 cp Lmaccess.h /usr/i686-w64-mingw32/include/
 ```
 
-Edit the evil.dll to your needs:  
+Edit the evil.c to your needs:  
 - change username & password  
 - change name of the local admin group -> language dependant  
 
@@ -45,6 +45,8 @@ cp evil32.dll /tmp/
 ```
 
 ### SMB configuration
+
+#### Linux  
 
 Easiest way to host payloads is to use samba and modify `/etc/samba/smb.conf   ` to allow anonymous access
 
@@ -70,6 +72,15 @@ Start SMB Service
 service smbd start
 ```
 
+#### Windows
+
+But you can also go the Windows route.  
+You may use the following scripts to make all needed changes according to the languages:  
+https://github.com/S3cur3Th1sSh1t/Creds/blob/master/PowershellScripts/Invoke-Anonymoussmb_de.ps1  
+https://github.com/S3cur3Th1sSh1t/Creds/blob/master/PowershellScripts/Invoke-Anonymoussmb_en.ps1  
+
+Tested on Windows 10, but should work on all other Windows versions.  
+
 ### exploit.py
 
 ```
@@ -89,9 +100,8 @@ Protocol: [MS-RPRN]: Print System Remote Protocol
 
 ### Mitigation
 
-https://doublepulsar.com/zero-day-for-every-supported-windows-os-version-in-the-wild-printnightmare-b3fdb82f840c  
-
-Disable Spooler service
+Disable Spooler service (might not be suitable on systems where local printing like PDF printers are needed - so test it).  
+And please: NO FCKN DCs NEED THIS SERVICE!!!  
 
 ```powershell
 Stop-Service Spooler
@@ -103,3 +113,12 @@ Or Uninstall Print-Services
 ```powershell
 Uninstall-WindowsFeature Print-Services
 ```
+
+### Further reading / tools  
+[Kevin Beaumont](https://twitter.com/GossiTheDog) gathered the most relevant facts and collected them here:  
+https://doublepulsar.com/zero-day-for-every-supported-windows-os-version-in-the-wild-printnightmare-b3fdb82f840c
+
+[Marcello](https://twitter.com/byt3bl33d3r) build a tool to scan for vulnerable systems from linux without actually exploiting them:  
+https://github.com/byt3bl33d3r/ItWasAllADream  
+
+[Benjamin Delpy](https://twitter.com/gentilkiwi) integrated the attack in the newest version of [mimikatz](https://github.com/gentilkiwi/mimikatz).  
