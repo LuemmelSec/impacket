@@ -1,6 +1,6 @@
 # CVE-2021-1675
 
-Borrowed from [cube0x0]()https://twitter.com/cube0x0 impacket fork: https://github.com/cube0x0/CVE-2021-1675  
+Borrowed from [cube0x0](https://twitter.com/cube0x0) impacket fork: https://github.com/cube0x0/CVE-2021-1675  
 
 ### Install
 
