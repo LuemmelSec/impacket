@@ -124,3 +124,5 @@ https://doublepulsar.com/zero-day-for-every-supported-windows-os-version-in-the-
 https://github.com/byt3bl33d3r/ItWasAllADream  
 
 [Benjamin Delpy](https://twitter.com/gentilkiwi) integrated the attack in the newest version of [mimikatz](https://github.com/gentilkiwi/mimikatz).  
+
+Walkthrough: https://pentestlab.blog/2021/08/17/domain-escalation-printnightmare/
