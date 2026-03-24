@@ -22,7 +22,7 @@ from impacket.ntlm import NTLMAuthChallenge
 from impacket.spnego import SPNEGO_NegTokenResp
 
 from impacket.dcerpc.v5 import transport, rpcrt, epm, tsch, icpr
-from impacket.dcerpc.v5 import transport, rpcrt, epm, tsch
+from impacket.uuid import uuidtup_to_bin
 from impacket.dcerpc.v5.ndr import NDRCALL
 from impacket.dcerpc.v5.rpcrt import DCERPC_v5, MSRPCBind, CtxItem, MSRPCHeader, SEC_TRAILER, MSRPCBindAck, \
     MSRPCRespHeader, MSRPCBindNak, DCERPCException, RPC_C_AUTHN_WINNT, RPC_C_AUTHN_LEVEL_CONNECT, \
@@ -127,24 +127,31 @@ class RPCRelayClient(ProtocolClient):
     def __init__(self, serverConfig, target, targetPort=None, extendedSecurity=True):
         ProtocolClient.__init__(self, serverConfig, target, targetPort, extendedSecurity)
 
-        # TODO: support relaying RPC to different endpoints (e.g. DCOM, SpoolSS)
         # TODO: create a single LOG interface for ntlmrelayx to provide a user info which message/error to which thread belongs
         self.endpoint = serverConfig.rpc_mode
+
+        # MS-CMRP (clusapi) interface UUID v3.0 — Failover Cluster API
+        MSRPC_UUID_CLUSAPI = uuidtup_to_bin(('b97db8b2-4c63-11cf-bff6-08002be23f2f', '3.0'))
 
         if self.endpoint == "TSCH":
             self.endpoint_uuid = tsch.MSRPC_UUID_TSCHS
         elif self.endpoint == "ICPR":
             self.endpoint_uuid = icpr.MSRPC_UUID_ICPR
+        elif self.endpoint == "CLUSAPI":
+            self.endpoint_uuid = MSRPC_UUID_CLUSAPI
         else:
-            raise NotImplementedError("Not implemented!")
+            raise NotImplementedError("RPC mode '%s' not implemented!" % self.endpoint)
 
         if self.serverConfig.rpc_use_smb:
             if self.endpoint == "TSCH":
                 self.stringbinding = "ncacn_np:%s[\\pipe\\atsvc]" % target.netloc
-            if self.endpoint == "ICPR":
+            elif self.endpoint == "ICPR":
                 self.stringbinding = "ncacn_np:%s[\\pipe\\cert]" % target.netloc
+            elif self.endpoint == "CLUSAPI":
+                # MS-CMRP is TCP-only; SMB named pipes not supported
+                raise NotImplementedError("CLUSAPI does not support relay over SMB named pipes. Use TCP (remove -rpc-use-smb).")
             else:
-                raise NotImplementedError("Not implemented!")
+                raise NotImplementedError("RPC mode '%s' not implemented!" % self.endpoint)
         else:
             LOG.debug("Connecting to ncacn_ip_tcp:%s[135] to determine %s stringbinding" % (target.netloc, self.endpoint))
             self.stringbinding = epm.hept_map(target.netloc, self.endpoint_uuid, protocol='ncacn_ip_tcp')

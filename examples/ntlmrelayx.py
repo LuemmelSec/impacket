@@ -362,7 +362,7 @@ if __name__ == '__main__':
     
     #RPC arguments
     rpcoptions = parser.add_argument_group("RPC client options")
-    rpcoptions.add_argument('-rpc-mode', choices=["TSCH", "ICPR"], default="TSCH", help='Protocol to attack')
+    rpcoptions.add_argument('-rpc-mode', choices=["TSCH", "ICPR", "CLUSAPI"], default="TSCH", help='Protocol to attack (TSCH=Task Scheduler, ICPR=AD CS, CLUSAPI=Failover Cluster)')
     rpcoptions.add_argument('-rpc-use-smb', action='store_true', required=False, help='Relay DCE/RPC to SMB pipes')
     rpcoptions.add_argument('-auth-smb', action='store', required=False, default='', metavar='[domain/]username[:password]',
         help='Use this credential to authenticate to SMB (low-privilege account)')

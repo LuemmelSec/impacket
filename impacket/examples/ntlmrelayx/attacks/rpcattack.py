@@ -29,6 +29,7 @@ from impacket.dcerpc.v5.dtypes import NULL
 from impacket.dcerpc.v5.icpr import DCERPCSessionError
 from impacket.examples.ntlmrelayx.attacks import ProtocolAttack
 from impacket.examples.ntlmrelayx.attacks.httpattacks.adcsattack import ADCSAttack
+from impacket.examples.ntlmrelayx.attacks.clusapi import run_clusapi_attack
 
 PROTOCOL_ATTACK_CLASS = "RPCAttack"
 
@@ -197,5 +198,8 @@ class RPCAttack(ProtocolAttack, TSCHRPCAttack):
                 LOG.error("No command provided to attack")
         elif self.endpoint == "ICPR":
             ICPRRPCAttack._run(self)
+        elif self.endpoint == "CLUSAPI":
+            run_clusapi_attack(self.config, self.dce, self.domain + '/' + self.username,
+                               interactive=self.config.interactive)
         else:
-            raise NotImplementedError("Not implemented!")
+            raise NotImplementedError("RPC mode '%s' not implemented!" % self.endpoint)
